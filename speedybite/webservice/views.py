@@ -1,14 +1,15 @@
-import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-
+from webservice.models import MenuItem
 
 @require_http_methods(["GET"])
-# Payment
+# Menu Items
 def menuList(request):
-    return HttpResponse(json.dumps(['sopa1', 'sopa2', 'sopa3', 'prato_1', 'prato_2', 'prato_3']));
+    menuItems = list(MenuItem.objects.values())
+    print("Menu items from database: ", menuItems)    
+    return JsonResponse({ 'menuItems' : menuItems});
 
 @csrf_exempt
 @require_http_methods(["POST"])
