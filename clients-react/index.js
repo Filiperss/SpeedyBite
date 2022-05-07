@@ -1,3 +1,6 @@
+//import axios from 'axios';
+const baseURL = "localhost:8000/webservice";
+
 class MenuList extends React.Component {
 
     constructor(props) {
@@ -40,8 +43,7 @@ class MenuList extends React.Component {
 
     payMeal(mealItems)
     {
-        //cal django web service
-        console.log(mealItems);
+        axios.post(baseURL + "/pay", mealItems).then(response => { console.log(response); }).catch(error => {console.error(error); });
     }
     
     deleteItemFromCart(index)
