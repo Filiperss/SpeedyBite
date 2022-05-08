@@ -5,6 +5,7 @@ class MenuList extends React.Component {
     constructor(props) {
         super(props);
         input.addEventListener("onchange", this.fileInputOnChange());
+        this.textreference = React.createRef();
         this.state = {items : [], clientMenu : [], selectedFile : [] };          
     }
 
@@ -31,7 +32,8 @@ class MenuList extends React.Component {
         return(
             <div>    
                 <div>            
-                    <ul>{reslist}</ul>                               
+                    <ul>{reslist}</ul>      
+                    <input type="text" placeholder="Location tag number" ref={this.textreference}/>                         
                 </div>
 
                 <div>    
@@ -45,12 +47,29 @@ class MenuList extends React.Component {
         )
     }
 
+    convertFileToJson(){
+        
+        // reCreate new Object and set File Data into it
+        var newObject  = {
+        'lastModified'     : this.state.selectedFile.lastModified,
+        'lastModifiedDate' : this.state.selectedFile.lastModifiedDate,
+        'name'             : this.state.selectedFile.name,
+        'size'             : this.state.selectedFile.size,
+        'type'             : this.state.selectedFile.type
+        };  
+        
+        // then use JSON.stringify on new object
+        return JSON.stringify(newObject);
+    }
+
     payMeal(mealItems)
     {
-        // Just makes the POST request only if the client selected anything from the menu
-        if(this.state.clientMenu.length > 0) 
+        // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
+        
+        if(this.state.clientMenu.length > 0 && this.state.selectedFile != undefined && this.textreference.current.value != "") 
         {    
-            axios.post(baseURL + "/pay", { items: mealItems }).then(response => { console.log(response); }).catch(error => {console.log(error); });
+            var image = this.convertFileToJson();
+            axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: image}).then(response => { console.log(response); }).catch(error => {console.log(error); });
         }
         else
         {
