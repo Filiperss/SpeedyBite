@@ -8,33 +8,31 @@ class MenuList extends React.Component {
 
   constructor(props) {
     super(props);
-    var input = document.getElementById("input");
-    input.addEventListener("onchange", this.fileInputOnChange());
-    this.textreference = React.createRef();
-    this.state = {items : ["lomboa", "asda"], clientMenu : [], selectedFile : [] };   
+    this.textreference = React.createRef();    
+    this.state = {items : [], clientMenu : [], selectedFile : [] };   
   }
 
   componentDidMount(){
     axios.get(baseURL + "/menuList").then((response) => {
-        //this.setState({items : response.data.menuItems });     
+        this.setState({items : response.data.menuItems });     
     });     
   }
-
-  render(){
+  
+  render(){    
     var reslist = [];
-    console.log(this.state.items);
-    for(var i = 0; i < this.state.items.length; i++){
-        reslist.push(<li key={i}>{this.state.items[1].name}
-            <button onClick={this.addItemToCart.bind(this, this.state.items[i])}>Add Meal Item</button> 
-            </li>)
-    }
-    
+    this.state.items.map((item, index) => {
+      reslist.push(<li key={index} > {item}
+        <button onClick={this.addItemToCart.bind(this, item)}>Add Meal Item</button> 
+        </li>);
+    });
+
     var clientItems = [];
-    for(var i = 0; i < this.state.clientMenu.length; i++){
-        clientItems.push(<li key={i}> {this.state.clientMenu[i].name}
-            <button onClick={this.deleteItemFromCart.bind(this, this.state.clientMenu[i])}>Remove Meal Item</button> 
-            </li>)
-    }
+    this.state.clientMenu.map((item, index) => {
+      clientItems.push(<li key={index} > {item}
+        <button onClick={this.deleteItemFromCart.bind(this, item)}>Remove Meal Item</button> 
+        </li>);
+    });
+
     return(
         <div>    
             <div> 
@@ -45,38 +43,24 @@ class MenuList extends React.Component {
 
            <div>    
                 <h2>Client's Menu List:</h2>        
-                <ul>
-                    {clientItems}      
-                </ul> 
+                <ul>{clientItems}</ul> 
                 <button onClick={this.payMeal.bind(this, this.state.clientMenu)}>Pay</button> 
             </div> 
+
+            <div>
+              <label>Client's Photo</label><br/>
+              <input type="file" id="input" accept=".png, .jpg, .jpeg" multiple="false" onChange={(event) => this.fileInputOnChange(event)}></input>
+            </div>   
         </div>
     )
   }
 
-  convertFileToJson(){
-    
-    // reCreate new Object and set File Data into it
-    var newObject  = {
-    'lastModified'     : this.state.selectedFile.lastModified,
-    'lastModifiedDate' : this.state.selectedFile.lastModifiedDate,
-    'name'             : this.state.selectedFile.name,
-    'size'             : this.state.selectedFile.size,
-    'type'             : this.state.selectedFile.type
-    };  
-    
-    // then use JSON.stringify on new object
-    return JSON.stringify(newObject);
-  }
-
   payMeal(mealItems)
-  {
+  {    
     // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
-    
-    if(this.state.clientMenu.length > 0 && this.state.selectedFile != undefined && this.textreference.current.value != "") 
-    {    
-        var image = this.convertFileToJson();
-        axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: image}).then(response => { console.log(response); }).catch(error => {console.log(error); });
+    if(this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
+    {
+        axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: this.state.selectedFile}).then(response => { console.log(response); }).catch(error => {console.log(error); });
     }
     else
     {
@@ -102,15 +86,16 @@ class MenuList extends React.Component {
 
     // It forces to render the view with the updated selection from the client 
     this.forceUpdate();
-  }
+  }  
 
-  fileInputOnChange(){
-    const fileInput = document.getElementById('input');
-    fileInput.onchange = () => {
-        this.setState(function(state, props){
-            this.state.selectedFile = fileInput.files[0];
-        });
-    }
+  fileInputOnChange(e){
+    let reader = new FileReader();
+
+    reader.onload = (e) => {      
+      this.setState({ selectedFile: e.target.result});
+    };
+
+    reader.readAsDataURL(e.target.files[0]); 
   }
 }
 
