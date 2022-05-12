@@ -1,4 +1,4 @@
-"""speedybite URL Configuration
+"""backend URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.0/topics/http/urls/
@@ -14,9 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path, re_path, include
+from django.shortcuts import render
+
+def render_react(request):
+    return render(request, "index.html")
 
 urlpatterns = [
-    path('webservice/', include('webservice.urls')),
     path('admin/', admin.site.urls),
+    path('webservice/', include('webservice.urls')),
+    re_path(r"^$", render_react),
+    re_path(r"^(?:.*)/?$", render_react),
 ]

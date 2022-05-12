@@ -2,12 +2,11 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from webservice.models import MenuItem
 
 @require_http_methods(["GET"])
 # Menu Items
 def menuList(request):
-    menuItems = list(MenuItem.objects.values())
+    menuItems = ['Sopa de Feijão', 'Caldo Verde', 'Lombo Assado']
     print("Menu items from database: ", menuItems)    
     return JsonResponse({ 'menuItems' : menuItems});
 
