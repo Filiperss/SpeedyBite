@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -14,9 +15,9 @@ def menuList(request):
     # Inside .aws/config type the region_name=...
 
     dynamodb = boto3.resource('dynamodb', 
-        aws_access_key_id = "ASIA2Q44LFHGNOBGB3TS", 
-        aws_secret_access_key = "60IrN3y5Gv96BSH+MmhmTTMFpmC3BAMUlnBYTdup",
-        aws_session_token= "FwoGZXIvYXdzEMj//////////wEaDDjtpT2YLUeXGqn5DiLLAdeQ08OH82zR/mVxMfVER93qYHTOwX9Ge4UX9UoTOs0OjharR0SMqCDp8yTuSooXVH+hbPdsuepxCkGYW9ER0XyaTUWGPMnfwRNkU39nICCQBaqA/C3AO8DTbrfZblwkv4xz/fRNN59PRYwO+EGGcFkCefiR/1MKYhYcgq9tvfTxsRgGW1alFFN0AMo0BoRUQhqdlaamYulVHhevdbIpvDhzlmKNFAelJIZEKhb6wkSBvaXG6tfKpcGIN867uVH2zCaYLP4g5OrD0ifVKNeRhJQGMi2UIbFljJPhXTF1ms9C14lU1r25ptvcI43wHa7D9qIv+GcZia4TWOdyq7FGtqA=", 
+        aws_access_key_id = "ASIA2Q44LFHGGXT5V7P6", 
+        aws_secret_access_key = "NCdAONe24vKk+b4oFdWSORX5SNFaejU34UiC+LzO",
+        aws_session_token= "FwoGZXIvYXdzEOP//////////wEaDNXf5JszvR5qZ9KMLiLLAa0nB4DN5yDhtCJvPGAcMNO4P8KhmUZT4mzZG5d8G2S9/f1ACmpOlAo5lUyeNqRlijdoHww4Yjnv1533SSlUtsjo2b5mdccFWNbGP9vYhYzSZ29POAHrbVP8CRRxyKcjwajo53zhA6Oph2AAru0RxyGVO2fhKgIlbMCdlqSvZGSJa3B7mpjWPnkYAHrwboNbprNJ8AFalI/2iX7e5Hn99FWYwb0KyqYBXi+j3Qge3B+xC/JIEvoHzymVN8EXyLmwrikVKro9DrhPS1GqKIWdipQGMi0JETBB4+wNePfEfmHonbWBQ8KIgrRBmAkKvQaKB35/alS+P2nlftiM4GKV0F8=", 
         region_name='us-east-1')
     
     # Gets data from database "MenuItems" 
@@ -43,3 +44,15 @@ def login(request):
 # Client's Face recognition
 def faceRecognition(request):
     return HttpResponse(NotImplemented);
+
+@csrf_exempt
+@require_http_methods(["POST"])
+# Calculates client's menu total price
+def calculateClientMenuPrice(request):
+    menuTotalPrice = 0
+    request_decoded = json.loads(request.body.decode("utf-8"))
+
+    for i in request_decoded:
+        menuTotalPrice = menuTotalPrice + float(i['ItemPrice'])
+
+    return HttpResponse(menuTotalPrice)

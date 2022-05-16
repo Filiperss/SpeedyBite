@@ -15,4 +15,6 @@ urlpatterns = [
     # Endpoint for the restaurant's menu
     path('menuList', views.menuList, name='menuList'),
 
+    # Endpoint to calculate client's menu price
+    path('calculateClientMenuPrice', views.calculateClientMenuPrice, name='calculateClientMenuPrice'),
 ]

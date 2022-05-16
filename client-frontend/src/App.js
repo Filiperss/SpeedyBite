@@ -21,14 +21,14 @@ class MenuList extends React.Component {
   render(){    
     var reslist = [];
     this.state.items.map((item, index) => {
-      reslist.push(<li key={index} > {item}
+      reslist.push(<li key={index} > {item.ItemName} - {item.ItemPrice}€
         <button onClick={this.addItemToCart.bind(this, item)}>Add Meal Item</button> 
         </li>);
     });
 
     var clientItems = [];
     this.state.clientMenu.map((item, index) => {
-      clientItems.push(<li key={index} > {item}
+      clientItems.push(<li key={index} > {item.ItemName} - {item.ItemPrice}€
         <button onClick={this.deleteItemFromCart.bind(this, item)}>Remove Meal Item</button> 
         </li>);
     });
@@ -44,15 +44,26 @@ class MenuList extends React.Component {
            <div>    
                 <h2>Client's Menu List:</h2>        
                 <ul>{clientItems}</ul> 
-                <button onClick={this.payMeal.bind(this, this.state.clientMenu)}>Pay</button> 
+                <span id="clientMenuPrice"></span>
+                <button onClick={this.calculatePrice.bind(this, this.state.clientMenu)}>Calculate Payment</button>
             </div> 
 
             <div>
               <label>Client's Photo</label><br/>
               <input type="file" id="input" accept=".png, .jpg, .jpeg" multiple="false" onChange={(event) => this.fileInputOnChange(event)}></input>
+              <br></br>
+              <button onClick={this.payMeal.bind(this, this.state.clientMenu)}>Pay</button> 
             </div>   
         </div>
     )
+  }
+
+  calculatePrice(items){
+    axios.post(baseURL + "/calculateClientMenuPrice", items).then(response => {
+      var span = document.getElementById("clientMenuPrice")
+      span.innerHTML = response.data;
+      span.style = "display: block";
+    }).catch(error => {console.log(error)});
   }
 
   payMeal(mealItems)
@@ -60,7 +71,14 @@ class MenuList extends React.Component {
     // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
     if(this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
     {
-        axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: this.state.selectedFile}).then(response => { console.log(response); }).catch(error => {console.log(error); });
+        axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: this.state.selectedFile}).then(response => { 
+          console.log(response); 
+                    
+          var span = document.getElementById("clientMenuPrice")
+          span.innerHTML = "";
+          span.style = "display: none";
+        }).catch(error => {console.log(error); });
+
     }
     else
     {
