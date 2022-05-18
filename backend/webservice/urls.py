@@ -1,5 +1,4 @@
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
@@ -17,4 +16,5 @@ urlpatterns = [
 
     # Endpoint to calculate client's menu price
     path('calculateClientMenuPrice', views.calculateClientMenuPrice, name='calculateClientMenuPrice'),
+
 ]

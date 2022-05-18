@@ -15,10 +15,10 @@ def menuList(request):
     # Inside .aws/config type the region_name=...
 
     dynamodb = boto3.resource('dynamodb', 
-        aws_access_key_id = "ASIA2Q44LFHGGXT5V7P6", 
-        aws_secret_access_key = "NCdAONe24vKk+b4oFdWSORX5SNFaejU34UiC+LzO",
-        aws_session_token= "FwoGZXIvYXdzEOP//////////wEaDNXf5JszvR5qZ9KMLiLLAa0nB4DN5yDhtCJvPGAcMNO4P8KhmUZT4mzZG5d8G2S9/f1ACmpOlAo5lUyeNqRlijdoHww4Yjnv1533SSlUtsjo2b5mdccFWNbGP9vYhYzSZ29POAHrbVP8CRRxyKcjwajo53zhA6Oph2AAru0RxyGVO2fhKgIlbMCdlqSvZGSJa3B7mpjWPnkYAHrwboNbprNJ8AFalI/2iX7e5Hn99FWYwb0KyqYBXi+j3Qge3B+xC/JIEvoHzymVN8EXyLmwrikVKro9DrhPS1GqKIWdipQGMi0JETBB4+wNePfEfmHonbWBQ8KIgrRBmAkKvQaKB35/alS+P2nlftiM4GKV0F8=", 
-        region_name='us-east-1')
+    aws_access_key_id = "ASIA2Q44LFHGKZRNICWV",
+    aws_secret_access_key = "39DJXpStU6578yCsgkyLUgb0oXCak4kFBgHmLpLn",
+    aws_session_token = "FwoGZXIvYXdzEBQaDIWEVd8ftV+JSwaNXCLLAeXbVaWC8mhccGkkXuYp5ZL6AuHH4NliMQ2A94mmyDlkaeUJe1e4kmUNI5AwfIT+1hUE0p/8O4UTZKWuR+Hcug+lYPDY/UAEkzZrEk3o5ybDKZZH6xSjScMWBOnYjvmkSsxf8sf0MJdfEq0+hK0DK1kBSZfD4Z3/S/yEXIKj/qMlqTiA1++cho3K089y+vEIx4F9UH7otnsY3QNWoKg6r6bQ1SsXyaLSY3SS9lnaE295qdFawYcajpQIxxyOe/g5SwBcecSXYC/ugBmGKPmClZQGMi2j3btzqt62NJPNGnRsSuFvnO82c9pks1GezXsxlO0jpaDgapOPp7Dw+nELSs8=", 
+    region_name='us-east-1')
     
     # Gets data from database "MenuItems" 
     table = dynamodb.Table('MenuItems')
@@ -33,7 +33,22 @@ def menuList(request):
 @require_http_methods(["POST"])
 # Payment
 def pay(request):
-    return HttpResponse("Payment sucessfull");
+    # Deserializes request to JSON
+    response_decoded = json.loads(request.body.decode("utf-8"))
+    
+    # Initiates the boto3 client for AWS stepfunctions
+    client = boto3.client('stepfunctions')
+
+    response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFaceInCollection',
+    input=json.dumps(response_decoded))
+    
+    # Get execution's status
+    response = client.describe_execution(
+        executionArn=response["executionArn"]
+    )
+    print(response)
+    
+    return HttpResponse("Payment sucessfull")
 
 @require_http_methods(["POST"])
 # Kitchen staff Login

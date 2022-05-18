@@ -67,7 +67,7 @@ class MenuList extends React.Component {
   }
 
   payMeal(mealItems)
-  {    
+  {        
     // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
     if(this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
     {
