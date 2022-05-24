@@ -3,7 +3,10 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
+from django.shortcuts import render
 import boto3
+
 
 @require_http_methods(["GET"])
 # Fetch every record of "MenuItems" table from AWS DynamoDB
@@ -71,3 +74,9 @@ def calculateClientMenuPrice(request):
         menuTotalPrice = menuTotalPrice + float(i['ItemPrice'])
 
     return HttpResponse(menuTotalPrice)
+
+
+""" Frontend Staff View Renderer"""
+class FrontendStaffRenderView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request,"fe-staff/index.html", {})

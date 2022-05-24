@@ -17,12 +17,16 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.shortcuts import render
 
+from webservice.views import FrontendStaffRenderView
+
 def render_react(request):
     return render(request, "index.html")
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('webservice/', include('webservice.urls')),
-    re_path(r"^$", render_react),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^webservice/', include('webservice.urls')),
+    re_path(r'^staff(?P<path>.*)', FrontendStaffRenderView.as_view(), name="staff"),
     re_path(r"^(?:.*)/?$", render_react),
 ]
+
+
