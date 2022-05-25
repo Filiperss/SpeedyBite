@@ -37,7 +37,6 @@ def menuList(request):
 def pay(request):
     # Deserializes request to JSON
     response_decoded = json.loads(request.body.decode("utf-8"))
-    print(response_decoded["fileName"])
 
     # Retrieves the first occurrence/index of "base64"
     index = response_decoded["clientPhoto"].find("base64")
@@ -47,24 +46,27 @@ def pay(request):
    
     s3 = boto3.resource('s3')  
     
-    obj = s3.Object('imageawsbucket', 'tmp/imagem.jpg')
+    filePath = 'tmp/'+response_decoded["fileName"]
+    obj = s3.Object('imageawsbucket', filePath)
     
     # Posts an object into AWS S3  
     obj.put(Body=base64.b64decode(headlessPhoto))
 
     # Initiates the boto3 client for AWS stepfunctions
-    # client = boto3.client('stepfunctions')
-    # s3 = boto3.resource('s3')
-    # s3.meta.client.put_object(Body=response_decoded["clientPhoto"], Bucket='imageawsbucket', Key='file.jpg')
-
-    # response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFaceInCollection',
-    # input=json.dumps(response_decoded))
+    client = boto3.client('stepfunctions')
+    
+    # Overwrites the old filePath to the new one, for the Rekognition to "recognize"
+    response_decoded["fileName"] = filePath
+    response_decoded["clientPhoto"] = ""
+    
+    response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFaceInCollection',
+    input = json.dumps(response_decoded))
     
     # Get execution's status
-    # response = client.describe_execution(
-    #    executionArn=response["executionArn"]
-    #)
-    # print(response)
+    response = client.describe_execution(
+        executionArn=response["executionArn"]
+    )
+    print(response)
     
     return HttpResponse("Payment sucessfull")
 
