@@ -8,8 +8,8 @@ urlpatterns = [
     # Endpoint for the kitchen staff login
     path('login', views.login, name='login'),
 
-    # Endpoint for the client's facial recognition confirmation, when delivering
-    path('faceRecognition', views.faceRecognition, name='faceRecognition'),
+    # Endpoint for the client's delivery confirmation
+    path('confirmDelivery', views.confirmDelivery, name='confirmDelivery'),
     
     # Endpoint for the restaurant's menu
     path('menuList', views.menuList, name='menuList'),

@@ -9,7 +9,7 @@ class MenuList extends React.Component {
   constructor(props) {
     super(props);
     this.textreference = React.createRef();    
-    this.state = {items : [], clientMenu : [], selectedFile : [] };   
+    this.state = {items : [], clientMenu : [], selectedFile : [], selectedFileName: [] };   
   }
 
   componentDidMount(){
@@ -69,11 +69,9 @@ class MenuList extends React.Component {
   payMeal(mealItems)
   {        
     // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
-    if(this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
+    if(true)//this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
     {
-        axios.post(baseURL + "/pay", {menuItems : mealItems, clientPhoto: this.state.selectedFile}).then(response => { 
-          console.log(response); 
-                    
+        axios.post(baseURL + "/pay", {menuItems : mealItems, fileName: this.state.selectedFileName, clientPhoto: this.state.selectedFile}).then(response => {                     
           var span = document.getElementById("clientMenuPrice")
           span.innerHTML = "";
           span.style = "display: none";
@@ -109,8 +107,10 @@ class MenuList extends React.Component {
   fileInputOnChange(e){
     let reader = new FileReader();
 
-    reader.onload = (e) => {      
-      this.setState({ selectedFile: e.target.result});
+    this.setState({selectedFileName: e.target.files[0].name });
+
+    reader.onload = (e, fileName) => {  
+      this.setState({ selectedFile: e.target.result });
     };
 
     reader.readAsDataURL(e.target.files[0]); 
