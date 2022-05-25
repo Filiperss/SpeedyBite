@@ -15,14 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-from django.shortcuts import render
+# from django.shortcuts import render
 
-def render_react(request):
-    return render(request, "index.html")
+# def render_react(request):
+#     return render(request, "index.html")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('webservice/', include('webservice.urls')),
-    re_path(r"^$", render_react),
-    re_path(r"^(?:.*)/?$", render_react),
+    path("staff/", include('reactstaff.urls')),
+    path("client/", include('reactclient.urls')),
+    # re_path(r"^$", include('reactclient.urls')),
+    # re_path(r"^(?:.*)/?$", include('reactclient.urls'))
 ]

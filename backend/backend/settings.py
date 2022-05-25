@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+REACT_ROUTE_REACT_CLIENT = os.path.join(BASE_DIR, 'reactclient', 'client-frontend', 'build')
+REACT_ROUTE_REACT_STAFF = os.path.join(BASE_DIR, 'reactstaff', 'staff-frontend', 'build')
 
 # Application definition
 
@@ -58,7 +60,10 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "build")],
+        'DIRS': [
+            REACT_ROUTE_REACT_CLIENT,
+            REACT_ROUTE_REACT_STAFF
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,11 +124,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+
+
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
   # Tell Django where to look for React's static files (css, js)
-  os.path.join(BASE_DIR, "build/static"),
+    os.path.join(BASE_DIR, 'reactclient', 'client-frontend', 'build', 'static'),
+    os.path.join(BASE_DIR, 'reactstaff', 'staff-frontend', 'build', 'static')
 ]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
