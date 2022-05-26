@@ -7,6 +7,12 @@ import boto3
 import base64
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from .models import User
+
+
 @require_http_methods(["GET"])
 # Fetch every record of "MenuItems" table from AWS DynamoDB
 def menuList(request):
@@ -70,10 +76,6 @@ def pay(request):
     
     return HttpResponse("Payment sucessfull")
 
-@require_http_methods(["POST"])
-# Kitchen staff Login
-def login(request):
-    return HttpResponse(NotImplemented);
 
 @require_http_methods(["POST"])
 # Client's Face recognition
@@ -91,3 +93,19 @@ def calculateClientMenuPrice(request):
         menuTotalPrice = menuTotalPrice + float(i['ItemPrice'])
 
     return HttpResponse(menuTotalPrice)
+
+# Staff Login
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data['username']
+        password = request.data['password']
+
+        user = User.objects.filter(username=username).first()
+
+        #if user is None or not user.check_password(password): 
+        # NOTE: Doesnt work because admin creates user manually, so check_password does not work
+        
+        if user is None or password != user.password:
+            raise AuthenticationFailed('Wrong Credentials.')
+
+        return Response({'message': 'Login Successful. Welcome!'})

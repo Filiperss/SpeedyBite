@@ -5,6 +5,6 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('', (TemplateView.as_view( 
-    template_name="../../staff-frontend/build/index.html",
-    )), name='backoffice'),
+        template_name="../../staff-frontend/build/index.html",
+    )), name='backoffice')
 ]

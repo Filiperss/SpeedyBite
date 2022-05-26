@@ -32,6 +32,9 @@ ALLOWED_HOSTS = []
 REACT_ROUTE_REACT_CLIENT = os.path.join(BASE_DIR, 'reactclient', 'client-frontend', 'build')
 REACT_ROUTE_REACT_STAFF = os.path.join(BASE_DIR, 'reactstaff', 'staff-frontend', 'build')
 
+# User Models
+AUTH_USER_MODEL = 'webservice.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'webservice.apps.WebserviceConfig', # <- for SQLite database
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'reactstaff',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -124,8 +131,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-
-
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
@@ -142,3 +147,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
