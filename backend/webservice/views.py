@@ -11,7 +11,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import User
-
+from .serializers import UserSerializer
+from django.contrib.auth.hashers import make_password, check_password
 
 @require_http_methods(["GET"])
 # Fetch every record of "MenuItems" table from AWS DynamoDB
@@ -94,18 +95,25 @@ def calculateClientMenuPrice(request):
 
     return HttpResponse(menuTotalPrice)
 
+# Staff Registration
+class RegisterStaffView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 # Staff Login
-class LoginView(APIView):
+class LoginStaffView(APIView):
     def post(self, request):
         username = request.data['username']
-        password = request.data['password']
+        encrypted_password = make_password(request.data['password'], 'ES2022')
 
         user = User.objects.filter(username=username).first()
 
         #if user is None or not user.check_password(password): 
         # NOTE: Doesnt work because admin creates user manually, so check_password does not work
-        
-        if user is None or password != user.password:
+        if user is None or encrypted_password != user.password:
             raise AuthenticationFailed('Wrong Credentials.')
 
         return Response({'message': 'Login Successful. Welcome!'})
