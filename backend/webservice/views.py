@@ -6,10 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 import boto3
 import base64
 
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+
 from .models import User
 from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
@@ -28,6 +30,7 @@ def menuList(request):
         aws_secret_access_key = "39DJXpStU6578yCsgkyLUgb0oXCak4kFBgHmLpLn",
         aws_session_token = "FwoGZXIvYXdzEBQaDIWEVd8ftV+JSwaNXCLLAeXbVaWC8mhccGkkXuYp5ZL6AuHH4NliMQ2A94mmyDlkaeUJe1e4kmUNI5AwfIT+1hUE0p/8O4UTZKWuR+Hcug+lYPDY/UAEkzZrEk3o5ybDKZZH6xSjScMWBOnYjvmkSsxf8sf0MJdfEq0+hK0DK1kBSZfD4Z3/S/yEXIKj/qMlqTiA1++cho3K089y+vEIx4F9UH7otnsY3QNWoKg6r6bQ1SsXyaLSY3SS9lnaE295qdFawYcajpQIxxyOe/g5SwBcecSXYC/ugBmGKPmClZQGMi2j3btzqt62NJPNGnRsSuFvnO82c9pks1GezXsxlO0jpaDgapOPp7Dw+nELSs8=",
         region_name='us-east-1')
+
     
     # Gets data from database "MenuItems" 
     table = dynamodb.Table('MenuItems')
@@ -36,7 +39,7 @@ def menuList(request):
     response = table.scan()
     
     # Returns every record in table "MenuItems"
-    return JsonResponse({ 'menuItems' : response["Items"]})
+    return Response({ 'menuItems' : response["Items"]})
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -96,24 +99,36 @@ def calculateClientMenuPrice(request):
     return HttpResponse(menuTotalPrice)
 
 # Staff Registration
-class RegisterStaffView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data = request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+@api_view(['POST'])
+def registerStaff(request):
+    serializer = UserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
 
-# Staff Login
-class LoginStaffView(APIView):
-    def post(self, request):
-        username = request.data['username']
-        encrypted_password = make_password(request.data['password'], 'ES2022')
+#Staff Login - DEPRECATED
+@api_view(['POST'])
+def loginStaff(request):
+    username = request.data['username']
+    encrypted_password = make_password(request.data['password'], 'ES2022')
 
-        user = User.objects.filter(username=username).first()
+    user = User.objects.filter(username=username).first()
 
-        #if user is None or not user.check_password(password): 
-        # NOTE: Doesnt work because admin creates user manually, so check_password does not work
-        if user is None or encrypted_password != user.password:
-            raise AuthenticationFailed('Wrong Credentials.')
+    #if user is None or not user.check_password(password):
+    # NOTE: Doesnt work because admin creates user manually, so check_password does not work
+    if user is None or encrypted_password != user.password:
+        raise AuthenticationFailed('Wrong Credentials.')
 
-        return Response({'message': 'Login Successful. Welcome!'})
+    return Response({'message': 'Login Successful. Welcome!'})
+
+#Get all Orders available
+@api_view(['GET'])
+def checkOrders(request):
+    permission_classes = (IsAuthenticated, )
+    return Response({'message': 'TODO'})
+
+#Pick an order that is currently available
+@api_view(['GET'])
+def pickOrder(request):
+    permission_classes = (IsAuthenticated, )
+    return Response({'message': 'TODO'})
