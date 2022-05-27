@@ -13,9 +13,9 @@ class MenuList extends React.Component {
   }
 
   componentDidMount(){
-    axios.get(baseURL + "/menuList").then((response) => {
-        this.setState({items : response.data.menuItems });     
-    });     
+    // axios.get(baseURL + "/menuList").then((response) => {
+    //     this.setState({items : response.data.menuItems });     
+    // });     
   }
   
   render(){    
