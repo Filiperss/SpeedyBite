@@ -13,9 +13,9 @@ class MenuList extends React.Component {
   }
 
   componentDidMount(){
-    // axios.get(baseURL + "/menuList").then((response) => {
-    //     this.setState({items : response.data.menuItems });     
-    // });     
+     axios.get(baseURL + "/menuList").then((response) => {
+         this.setState({items : response.data.menuItems });     
+     });     
   }
   
   render(){    
@@ -69,13 +69,21 @@ class MenuList extends React.Component {
   payMeal(mealItems)
   {        
     // Just makes the POST request only if the client selected anything from the menu, uploaded his image and introduced his location tag number
-    if(true)//this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
+    if(this.state.clientMenu.length > 0 && this.state.selectedFile.length != 0 && this.textreference.current.value != "") 
     {
-        axios.post(baseURL + "/pay", {menuItems : mealItems, fileName: this.state.selectedFileName, clientPhoto: this.state.selectedFile}).then(response => {                     
+        axios.post(baseURL + "/pay", {menuItems : mealItems, locationTag: this.textreference.current.value, fileName: this.state.selectedFileName, clientPhoto: this.state.selectedFile}).then(response => {  
+          
+          alert("Status Code: " + response.status + "\n" + response.data);
+
           var span = document.getElementById("clientMenuPrice")
           span.innerHTML = "";
           span.style = "display: none";
-        }).catch(error => {console.log(error); });
+
+        }).catch(error => {
+
+          alert("Status Code: " + error.status + "\n" + error.data);
+         
+        });
 
     }
     else
