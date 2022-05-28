@@ -33,7 +33,7 @@ urlpatterns = [
     path('token/refresh', TokenRefreshView.as_view()),
 
     # Endpoint for the kitchen staff register
-    path('register', views.registerStaff),
+    path('register', views.RegisterStaff.as_view()),
 
     # Endpoint for the kitchen staff login - DEPRECATED, use /token instead
     path('login', views.loginStaff),

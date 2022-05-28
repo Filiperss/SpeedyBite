@@ -7,6 +7,8 @@ import boto3
 import base64
 
 from rest_framework.views import APIView
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field, OpenApiTypes
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import AuthenticationFailed
@@ -45,11 +47,11 @@ def menuList(request):
     # return Response({ 'menuItems' : response["Items"]})
     return JsonResponse({'message': 'Temporary Maintenance'})
 
+# Payment
 # @csrf_exempt
 @authentication_classes([])
 @permission_classes([])
 @api_view(["POST"])
-# Payment
 def pay(request):
     # Deserializes request to JSON
     response_decoded = json.loads(request.body.decode("utf-8"))
@@ -109,30 +111,38 @@ def calculateClientMenuPrice(request):
     return HttpResponse(menuTotalPrice)
 
 # Staff Registration
-@api_view(['POST'])
+# @api_view(['POST'])
+# @authentication_classes([])
+# @permission_classes([])
+# def registerStaff(request):
+#     authentication_classes = []
+#     permission_classes = []
+#     serializer = UserSerializer(data=request.data)
+#     serializer.is_valid(raise_exception=True)
+#     serializer.save()
+#     return Response(serializer.data)
 @authentication_classes([])
 @permission_classes([])
-def registerStaff(request):
-    authentication_classes = []
-    permission_classes = []
-    serializer = UserSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(serializer.data)
-
-# class RegisterStaff(APIView):
-#     def post(self, request):
-#         serializer = UserSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data)
+class RegisterStaff(APIView):
+    # @extend_schema(
+    #     parameters=[
+    #         OpenApiParameter(name='name', description='Name of the Staff', required=False, type=str),
+    #         OpenApiParameter(name='username', description='Username of the Staff', required=True, type=str),
+    #         OpenApiParameter(name='password', required=True, type=str),
+    #     ])
+    @extend_schema(request=None, responses=UserSerializer)
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 #Staff Login - DEPRECATED
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
 def loginStaff(request):
-    username = request.data['username']
+    username = request.data.get('username')
     encrypted_password = make_password(request.data['password'], 'ES2022')
 
     user = User.objects.filter(username=username).first()
@@ -150,11 +160,11 @@ def loginStaff(request):
 #Get all Orders available
 @api_view(['GET'])
 def checkOrders(request):
-    permission_classes = (IsAuthenticated, )
+    # permission_classes = (IsAuthenticated, )
     return Response({'message': 'TODO'})
 
 #Pick an order that is currently available
 @api_view(['GET'])
 def pickOrder(request):
-    permission_classes = (IsAuthenticated, )
+    # permission_classes = (IsAuthenticated, )
     return Response({'message': 'TODO'})

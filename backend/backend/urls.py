@@ -23,7 +23,8 @@ from django.urls import path, re_path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('webservice/', include('webservice.urls')),
-    path('staff/', include('reactstaff.urls')),
+    # re_path(r'^staff/$', include('reactstaff.urls')),
+    re_path(r'^staff/[\s\S]*$', include('reactstaff.urls')),
     re_path(r"^$", include('reactclient.urls')),
     re_path(r"^(?:.*)/?$", include('reactclient.urls'))
 ]

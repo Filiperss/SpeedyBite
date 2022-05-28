@@ -18,12 +18,3 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.save()
         return user
-        # password = validated_data.pop('password', None)
-        # instance = self.Meta.model(**validated_data)
-        # if password is not None:
-        #     print(make_password(password=password,salt='ES2022'))
-        #     print(make_password(password=password,salt='ES2022'))
-        #     instance.save(is_active=False, is_confirmed=False,
-        #                           password=make_password(password=password, salt='ES2022'))
-        #     # instance.save()
-        #     return instance
