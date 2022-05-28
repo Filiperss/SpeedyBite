@@ -12,6 +12,9 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import Alert from '@mui/material/Alert'
+
+import { createRoot } from 'react-dom/client';
 
 async function loginUser(credentials) {
 
@@ -33,6 +36,7 @@ const theme = createTheme();
 // const [password, setPassword] = useState();
 
 export default function SignIn({setToken}) {
+
   const handleSubmit = async e => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -47,17 +51,20 @@ export default function SignIn({setToken}) {
         throw new Error('Fields Required')
       }
       setToken(tokenData);
-    }
-    catch(err) {
+      // window.location.href = '/';
+    }catch(err) {
       console.log(err)
+
+      const container = document.getElementById('alert');
+      const root = createRoot(container);
+      root.render(<Alert severity="error">{err.message}</Alert>);
     }
 
-    window.location.href = '/';
   }
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container id="container-login" component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
@@ -103,6 +110,7 @@ export default function SignIn({setToken}) {
           </Box>
         </Box>
       </Container>
+      <div id="alert" style={{position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: '0'}}></div>
     </ThemeProvider>
   );
 }

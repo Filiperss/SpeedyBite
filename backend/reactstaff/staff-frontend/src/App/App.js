@@ -10,7 +10,6 @@ import { isExpired, useJwt } from "react-jwt";
 // import { render } from '@testing-library/react';
 
 function App() {
-
   let { token, setToken } = useToken();
 
   const { decodedToken, isExpired } = useJwt(token);
@@ -19,7 +18,9 @@ function App() {
 
   if(!token) {
     return  <Login setToken={setToken} />
-  }else if(isExpired){
+  }
+  
+  if(isExpired){
     token = requestToken(token,setToken)
     if(token === undefined) {
       return <Login setToken={setToken} />
