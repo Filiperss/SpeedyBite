@@ -21,7 +21,7 @@ export default function ButtonAppBar() {
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             <i>SpeedyBite</i> 
           </Typography>
-          <Typography variant="p" component="div" inline sx={{ flexGrow: 45 }}>
+          <Typography variant="p" component="div" sx={{ flexGrow: 45 }}>
             <i>BackOffice</i> 
           </Typography>
           <Button color="inherit" onClick={logOut}>Logout</Button>
