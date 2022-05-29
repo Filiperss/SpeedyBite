@@ -1,4 +1,5 @@
 import json
+from sre_constants import SUCCESS
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -24,34 +25,22 @@ from django.contrib.auth.hashers import make_password, check_password
 @authentication_classes([])
 @permission_classes([])
 def menuList(request):
-    # Better pratice is to create a folder named .aws, in home directory, and inside that, 2 files called credentials and config:
-    # cd ~ | mkdir .aws | echo .aws/config | echo .aws/credentials
-
-    # Inside .aws/credentials type the aws_access_key_id=.., aws_secret_access_key=.., aws_session_token=..
-    # Inside .aws/config type the region_name=...
-
-    dynamodb = boto3.resource('dynamodb', 
-        aws_access_key_id = "ASIA2Q44LFHGKZRNICWV",
-        aws_secret_access_key = "39DJXpStU6578yCsgkyLUgb0oXCak4kFBgHmLpLn",
-        aws_session_token = "FwoGZXIvYXdzEBQaDIWEVd8ftV+JSwaNXCLLAeXbVaWC8mhccGkkXuYp5ZL6AuHH4NliMQ2A94mmyDlkaeUJe1e4kmUNI5AwfIT+1hUE0p/8O4UTZKWuR+Hcug+lYPDY/UAEkzZrEk3o5ybDKZZH6xSjScMWBOnYjvmkSsxf8sf0MJdfEq0+hK0DK1kBSZfD4Z3/S/yEXIKj/qMlqTiA1++cho3K089y+vEIx4F9UH7otnsY3QNWoKg6r6bQ1SsXyaLSY3SS9lnaE295qdFawYcajpQIxxyOe/g5SwBcecSXYC/ugBmGKPmClZQGMi2j3btzqt62NJPNGnRsSuFvnO82c9pks1GezXsxlO0jpaDgapOPp7Dw+nELSs8=",
-        region_name='us-east-1')
-
+    dynamodb = boto3.resource('dynamodb')
     
-    # Gets data from database "MenuItems" 
+    # # Gets data from database "MenuItems" 
     table = dynamodb.Table('MenuItems')
 
-    # Scans every record from table "MenuItems"
+    # # Scans every record from table "MenuItems"
     response = table.scan()
     
-    # Returns every record in table "MenuItems"
-    return Response({ 'menuItems' : response["Items"]})
-    # return JsonResponse({'message': 'Temporary Maintenance'})
+    # # Returns every record in table "MenuItems"
+    return JsonResponse({ 'menuItems' : response["Items"]})
 
 # Payment
-# @csrf_exempt
-@authentication_classes([])
-@permission_classes([])
-@api_view(["POST"])
+@csrf_exempt
+#@authentication_classes([])
+#@permission_classes([])
+#@api_view(["POST"])
 def pay(request):
     # Deserializes request to JSON
     response_decoded = json.loads(request.body.decode("utf-8"))
@@ -76,18 +65,28 @@ def pay(request):
     # Overwrites the old filePath to the new one, for the Rekognition to "recognize"
     response_decoded["fileName"] = filePath
     response_decoded["clientPhoto"] = ""
-    
-    response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFaceInCollection',
-    input = json.dumps(response_decoded))
-    
-    # Get execution's status
-    response = client.describe_execution(
-        executionArn=response["executionArn"]
-    )
-    print(response)
-    
-    return HttpResponse("Payment sucessfull")
 
+    # Starts execution of AWS Rekognition Step-Function 
+    response = client.start_sync_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFace',
+    input = json.dumps(response_decoded))
+
+    outputRekognition = json.loads(response["output"])
+    response_decoded["fileName"] = ""
+    response_decoded["clientName"] = outputRekognition["body"]["message"]
+    
+    # If face is recognized, it executes "create-order" Step-Function
+    if(outputRekognition["statusCode"] == 200):
+
+        # Starts execution of "Create-order" Step-Function
+        response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:ActivityCreator',
+        input = json.dumps(response_decoded))
+
+        if(response["HTTPStatusCode"] == 200):
+            return HttpResponse("\nPayment successfully done.\nWe are cooking your meal.\n")
+        else:
+            return HttpResponse("\nSomething went wrong while processing the payment.\nPlease try again.\n")    
+    else:
+        return HttpResponse("\nFace not recognized, please try again.\n")
 
 @api_view(["POST"])
 @authentication_classes([])
@@ -96,10 +95,10 @@ def pay(request):
 def confirmDelivery(request):
     return HttpResponse(NotImplemented);
 
-# @csrf_exempt
-@authentication_classes([])
-@permission_classes([])
-@api_view(["POST"])
+#@csrf_exempt
+#@authentication_classes([])
+#@permission_classes([])
+#@api_view(["POST"])
 # Calculates client's menu total price
 def calculateClientMenuPrice(request):
     menuTotalPrice = 0
@@ -108,7 +107,7 @@ def calculateClientMenuPrice(request):
     for i in request_decoded:
         menuTotalPrice = menuTotalPrice + float(i['ItemPrice'])
 
-    return HttpResponse(menuTotalPrice)
+    return JsonResponse(menuTotalPrice)
 
 # Staff Registration
 # @api_view(['POST'])

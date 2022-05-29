@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-bm(7l(zr)22yjw9+b-^p(l=lcnnb!4uf1shudwyijg)%1_)nfc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['speedy-bite.us-east-1.elasticbeanstalk.com', 'localhost']
 
 REACT_ROUTE_REACT_CLIENT = os.path.join(BASE_DIR, 'reactclient', 'client-frontend', 'build')
 REACT_ROUTE_REACT_STAFF = os.path.join(BASE_DIR, 'reactstaff', 'staff-frontend', 'build')
