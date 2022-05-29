@@ -1,4 +1,3 @@
-import './Menu.css';
 import React from 'react';
 import axios from "axios";
 
@@ -13,9 +12,9 @@ class MenuList extends React.Component {
   }
 
   componentDidMount(){
-    // axios.get(baseURL + "/menuList").then((response) => {
-    //     this.setState({items : response.data.menuItems });     
-    // });     
+    axios.get(baseURL + "/menuList").then((response) => {
+        this.setState({items : response.data.menuItems });     
+    });     
   }
   
   render(){    
@@ -50,7 +49,7 @@ class MenuList extends React.Component {
 
             <div>
               <label>Client's Photo</label><br/>
-              <input type="file" id="input" accept=".png, .jpg, .jpeg" multiple="false" onChange={(event) => this.fileInputOnChange(event)}></input>
+              <input type="file" id="input" accept=".png, .jpg, .jpeg" multiple={false} onChange={(event) => this.fileInputOnChange(event)}></input>
               <br></br>
               <button onClick={this.payMeal.bind(this, this.state.clientMenu)}>Pay</button> 
             </div>   

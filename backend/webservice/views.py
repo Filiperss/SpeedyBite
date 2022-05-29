@@ -24,28 +24,28 @@ from django.contrib.auth.hashers import make_password, check_password
 @authentication_classes([])
 @permission_classes([])
 def menuList(request):
-    # # Better pratice is to create a folder named .aws, in home directory, and inside that, 2 files called credentials and config:
-    # # cd ~ | mkdir .aws | echo .aws/config | echo .aws/credentials
+    # Better pratice is to create a folder named .aws, in home directory, and inside that, 2 files called credentials and config:
+    # cd ~ | mkdir .aws | echo .aws/config | echo .aws/credentials
 
-    # # Inside .aws/credentials type the aws_access_key_id=.., aws_secret_access_key=.., aws_session_token=..
-    # # Inside .aws/config type the region_name=...
+    # Inside .aws/credentials type the aws_access_key_id=.., aws_secret_access_key=.., aws_session_token=..
+    # Inside .aws/config type the region_name=...
 
-    # dynamodb = boto3.resource('dynamodb', 
-    #     aws_access_key_id = "ASIA2Q44LFHGKZRNICWV",
-    #     aws_secret_access_key = "39DJXpStU6578yCsgkyLUgb0oXCak4kFBgHmLpLn",
-    #     aws_session_token = "FwoGZXIvYXdzEBQaDIWEVd8ftV+JSwaNXCLLAeXbVaWC8mhccGkkXuYp5ZL6AuHH4NliMQ2A94mmyDlkaeUJe1e4kmUNI5AwfIT+1hUE0p/8O4UTZKWuR+Hcug+lYPDY/UAEkzZrEk3o5ybDKZZH6xSjScMWBOnYjvmkSsxf8sf0MJdfEq0+hK0DK1kBSZfD4Z3/S/yEXIKj/qMlqTiA1++cho3K089y+vEIx4F9UH7otnsY3QNWoKg6r6bQ1SsXyaLSY3SS9lnaE295qdFawYcajpQIxxyOe/g5SwBcecSXYC/ugBmGKPmClZQGMi2j3btzqt62NJPNGnRsSuFvnO82c9pks1GezXsxlO0jpaDgapOPp7Dw+nELSs8=",
-    #     region_name='us-east-1')
+    dynamodb = boto3.resource('dynamodb', 
+        aws_access_key_id = "ASIA2Q44LFHGKZRNICWV",
+        aws_secret_access_key = "39DJXpStU6578yCsgkyLUgb0oXCak4kFBgHmLpLn",
+        aws_session_token = "FwoGZXIvYXdzEBQaDIWEVd8ftV+JSwaNXCLLAeXbVaWC8mhccGkkXuYp5ZL6AuHH4NliMQ2A94mmyDlkaeUJe1e4kmUNI5AwfIT+1hUE0p/8O4UTZKWuR+Hcug+lYPDY/UAEkzZrEk3o5ybDKZZH6xSjScMWBOnYjvmkSsxf8sf0MJdfEq0+hK0DK1kBSZfD4Z3/S/yEXIKj/qMlqTiA1++cho3K089y+vEIx4F9UH7otnsY3QNWoKg6r6bQ1SsXyaLSY3SS9lnaE295qdFawYcajpQIxxyOe/g5SwBcecSXYC/ugBmGKPmClZQGMi2j3btzqt62NJPNGnRsSuFvnO82c9pks1GezXsxlO0jpaDgapOPp7Dw+nELSs8=",
+        region_name='us-east-1')
 
     
-    # # Gets data from database "MenuItems" 
-    # table = dynamodb.Table('MenuItems')
+    # Gets data from database "MenuItems" 
+    table = dynamodb.Table('MenuItems')
 
-    # # Scans every record from table "MenuItems"
-    # response = table.scan()
+    # Scans every record from table "MenuItems"
+    response = table.scan()
     
-    # # Returns every record in table "MenuItems"
-    # return Response({ 'menuItems' : response["Items"]})
-    return JsonResponse({'message': 'Temporary Maintenance'})
+    # Returns every record in table "MenuItems"
+    return Response({ 'menuItems' : response["Items"]})
+    # return JsonResponse({'message': 'Temporary Maintenance'})
 
 # Payment
 # @csrf_exempt
@@ -124,12 +124,6 @@ def calculateClientMenuPrice(request):
 @authentication_classes([])
 @permission_classes([])
 class RegisterStaff(APIView):
-    # @extend_schema(
-    #     parameters=[
-    #         OpenApiParameter(name='name', description='Name of the Staff', required=False, type=str),
-    #         OpenApiParameter(name='username', description='Username of the Staff', required=True, type=str),
-    #         OpenApiParameter(name='password', required=True, type=str),
-    #     ])
     @extend_schema(request=None, responses=UserSerializer)
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)

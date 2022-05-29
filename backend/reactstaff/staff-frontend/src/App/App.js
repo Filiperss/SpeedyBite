@@ -16,15 +16,17 @@ function App() {
   
   console.log("token", token)
 
-  if(!token) {
-    return  <Login setToken={setToken} />
+  const handleTokenInvalid = () => {
+    if(!token) {
+      return  <Login setToken={setToken} />
+    }
   }
   
+  handleTokenInvalid();
+
   if(isExpired){
     token = requestToken(token,setToken)
-    if(token === undefined) {
-      return <Login setToken={setToken} />
-    }
+    handleTokenInvalid();
   }
 
   return (
