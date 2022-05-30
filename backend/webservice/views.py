@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 import boto3
 import base64
 
+from boto3.dynamodb.conditions import Key
+
 from rest_framework.views import APIView
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field, OpenApiTypes
 
@@ -135,17 +137,26 @@ class RegisterStaff(APIView):
 @authentication_classes([])
 @permission_classes([])
 def loginStaff(request):
-    username = request.data.get('username')
-    encrypted_password = make_password(request.data['password'], 'ES2022')
+    response_decoded = json.loads(request.body.decode("utf-8"))
 
-    user = User.objects.filter(username=username).first()
+    username = response_decoded["username"]
+    encrypted_password = make_password(response_decoded['password'], 'ES2022')
 
-    print(user.password)
-    print(encrypted_password)
+    dynamodb = boto3.resource('dynamodb')
 
-    #if user is None or not user.check_password(password):
+    # Gets data from table "Users" 
+    table = dynamodb.Table('Staff')
+
+    # Fetches record from "Staff" of given username (passed by input)
+    response = table.query(KeyConditionExpression=Key('username').eq(username))
+    
+    # Get items returned by table.query()
+    # It could return more than one, how it is done currently, but for now it works
+    item = response["Items"]
+
+    #if there are no items returned (Count == 0) or if passwords don't match
     # NOTE: Doesnt work because admin creates user manually, so check_password does not work
-    if user is None or encrypted_password != user.password:
+    if response["Count"] == 0 or encrypted_password != item[0]["password"]:
         raise AuthenticationFailed('Wrong Credentials.')
 
     return Response({'message': 'Login Successful. Welcome!'})
