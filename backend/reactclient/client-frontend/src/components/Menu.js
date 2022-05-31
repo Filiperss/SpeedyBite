@@ -1,8 +1,6 @@
 import React from 'react';
 import axios from "axios";
 
-const baseURL = "http://localhost:8000/webservice";
-
 class MenuList extends React.Component {
 
   constructor(props) {

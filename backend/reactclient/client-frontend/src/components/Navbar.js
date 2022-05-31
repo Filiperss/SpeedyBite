@@ -12,7 +12,7 @@ export default function ButtonAppBar() {
       <AppBar position="static" color="error">
         <Toolbar>
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-            <i>SpeedyBite</i> 
+            <a style={{textDecoration: 'none',  color: 'inherit'}} href="/"><i>SpeedyBite</i></a>
           </Typography>
         </Toolbar>
       </AppBar>

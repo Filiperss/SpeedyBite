@@ -6,12 +6,14 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import boto3
 import base64
+import uuid
 
 from boto3.dynamodb.conditions import Key
 
 from rest_framework.views import APIView
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field, OpenApiTypes
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import AuthenticationFailed
@@ -27,7 +29,11 @@ from django.contrib.auth.hashers import make_password, check_password
 @authentication_classes([])
 @permission_classes([])
 def menuList(request):
-    dynamodb = boto3.resource('dynamodb')
+
+    dynamodb = boto3.resource('dynamodb', aws_access_key_id="ASIAVREJBYCM7QUVYLVP",
+                              aws_secret_access_key="GmrTkVDye5MjbZ0vcBEDYnA/QF8wKKTuwWUlFhMy",
+                              aws_session_token="FwoGZXIvYXdzEEkaDOZo57OfczFJmrudpCLLAehXQX2i+6tkAe1UyBT8Kc3Id1wUepikgFoPNyawqdlAQwfVIJPrWW3RH/9bre8XEoeHwzdpHAXl9i/TquNw90S+uRED3ePmbXhbSLnow7R26UQPGRO21tReJ29Rf1xjx8eKijltuoe91d9oSRwqP7kO9OcWfWwSdShn/mGJ7LMdPHGZYHItldyKmI5oh92jAtnYPdl2CXy51rNHi09X7klEt1InPGCn50I3cNCUyCIh/bcEWl+25qIPmwgXk7nNDrRp/H17XzsMHaJuKL312JQGMi1kUMXV0/OpJxSK883f7Vjhbc9mE/bah2F33bJeI5POB2ssuMbrEwEmXGFQryI=",
+                              region_name="us-east-1")
     
     # # Gets data from database "MenuItems" 
     table = dynamodb.Table('MenuItems')
@@ -39,11 +45,12 @@ def menuList(request):
     return JsonResponse({ 'menuItems' : response["Items"]})
 
 # Payment
-@csrf_exempt
-#@authentication_classes([])
-#@permission_classes([])
-#@api_view(["POST"])
+# @csrf_exempt
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def pay(request):
+    print(request)
     # Deserializes request to JSON
     response_decoded = json.loads(request.body.decode("utf-8"))
 
@@ -55,7 +62,8 @@ def pay(request):
    
     s3 = boto3.resource('s3')  
     
-    filePath = 'tmp/'+response_decoded["fileName"]
+    # filePath = 'tmp/'+response_decoded["fileName"] 
+    filePath = 'tmp/'+str(uuid.uuid4()) 
     obj = s3.Object('imageawsbucket', filePath)
     
     # Posts an object into AWS S3  
@@ -72,23 +80,25 @@ def pay(request):
     response = client.start_sync_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:SearchFace',
     input = json.dumps(response_decoded))
 
-    outputRekognition = json.loads(response["output"])
-    response_decoded["fileName"] = ""
-    response_decoded["clientName"] = outputRekognition["body"]["message"]
+
     
     # If face is recognized, it executes "create-order" Step-Function
-    if(outputRekognition["statusCode"] == 200):
+    if(response["status"] != "FAILED"):
+
+        outputRekognition = json.loads(response["output"])
+        response_decoded["fileName"] = ""
+        response_decoded["clientName"] = outputRekognition["body"]["message"]
 
         # Starts execution of "Create-order" Step-Function
         response = client.start_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:ActivityCreator',
         input = json.dumps(response_decoded))
-
-        if(response["HTTPStatusCode"] == 200):
-            return HttpResponse("\nPayment successfully done.\nWe are cooking your meal.\n")
+        print(response)
+        if(response["ResponseMetadata"]["HTTPStatusCode"] == 200):
+            return Response({"message": "Payment successfully done.\nWe are cooking your meal."})
         else:
-            return HttpResponse("\nSomething went wrong while processing the payment.\nPlease try again.\n")    
+            return Response({"message": "Something went wrong while processing the payment. Please try again."}, status= status.HTTP_500_INTERNAL_SERVER_ERROR)    
     else:
-        return HttpResponse("\nFace not recognized, please try again.\n")
+        return Response({"message": "Face not recognized, please try again."}, status= status.HTTP_404_NOT_FOUND)
 
 @api_view(["POST"])
 @authentication_classes([])

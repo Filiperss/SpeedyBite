@@ -1,0 +1,53 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.camera{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.camera video, .result canvas{
+    border-radius: 25px;
+}
+
+.snap-btn, .retake{
+    position: absolute;
+    z-index: 2;
+    top: -35px;
+}
+
+.result {
+    flex-direction: column;
+    align-items: center;
+    display: none;
+}
+
+.hasPhoto{
+    display: flex !important;
+}
+
+.hide-camera{
+    display: none !important;
+}
+
+.success-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 70vh;
+}
+
+.success-container h1{
+    font-weight: lighter;
+    font-size: 4.5rem;
+    margin: 0 100px 60px;
+    text-align: center;
+}

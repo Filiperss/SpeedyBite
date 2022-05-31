@@ -19,59 +19,36 @@ class MenuList extends React.Component {
     this.textreference = React.createRef();    
     this.state = {
       items : [],
-      rows: [
-        { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 , price: '10€'},
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 , price: '10€'},
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 , price: '10€'},
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 , price: '10€'},
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null , price: '10€'},
-        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 , price: '10€'},
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 , price: '10€'},
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36, price: '10€' },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65, price: '10€'},
-      ],
       columns: [
         { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'firstName',flex:1, headerName: 'First name', width: 130 },
-        { field: 'lastName', flex:1, headerName: 'Last name', width: 130 },
+        { field: 'ItemName',flex:1, headerName: 'Name', width: 130 },
+        { field: 'Type', headerName: 'Type', width: 130 },
         {
-          field: 'age',
-          headerName: 'Age',
-          type: 'number',
-          width: 90,
-          flex:1
-        },
-        {
-          field: 'fullName',
-          flex: 2,
-          headerName: 'Full name',
-          description: 'This column has a value getter and is not sortable.',
-          sortable: false,
-          width: 160,
-          valueGetter: (params) =>
-            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-        },
-        {
-          field: 'price',
-          flex: 2,
+          field: 'ItemPrice',
           headerName: 'Price (€)',
-          type: 'number',
           sortable: true,
+          align: 'right',
           valueGetter: (params) =>
-            `${params.row.price.split('€')[0]}`,
+            `${params.row.ItemPrice}€`,
         }
       ],
       clientMenu : [],
       hasErrorLoading: false,
-      isLoading: false,
+      isLoading: true,
       isPaying: false,
     };   
   }
 
   componentDidMount(){
     axios.get(baseURL + "/menuList").then((response) => {
+        response.data.menuItems.forEach(element => {
+          element.id = element.Id
+          delete element.Id
+        });   
+        
         this.setState({isLoading: false})
-        this.setState({items : response.data.menuItems });     
+        this.setState({items : response.data.menuItems });  
+        console.log(this.state.items  )
     }).catch( err => {
       this.setState({isLoading: false})
       console.log(err.message)
@@ -82,7 +59,7 @@ class MenuList extends React.Component {
     let label = '0€'
       if(this.state.clientMenu.length != 0){
         label =  this.state.clientMenu.reduce((accumulator, object) => {
-          return accumulator + parseInt(object.price.split('€')[0])
+          return accumulator + parseFloat(object.ItemPrice)
         },0) + '€'
       }
       return <span><b>{label}</b></span>
@@ -106,18 +83,18 @@ class MenuList extends React.Component {
         <h1 align="center">Menu List</h1>
         {this.state.isLoading ? 
         (
-          <div >
+          <div>
             <CircularProgress color="error" size="5rem" sx={{position: 'absolute', left: '47.5%', top: '0', mt: '10rem'}}/>
           </div>  
         ) :
         (
           <div>
             <DataGrid
-              sx={{height:'600px', mx: '15vw', mb: '16px', width: 'auto'}}
-              rows={this.state.rows}
+              sx={{height:'600px', mx: '25vw', mb: '16px', width: 'auto'}}
+              rows={this.state.items}
               onSelectionModelChange={(ids) => {
                 const selectedIDs = new Set(ids)
-                const selectedRowData = this.state.rows.filter((row) =>
+                const selectedRowData = this.state.items.filter((row) =>
                   selectedIDs.has(row.id)
                 )
                 this.setState({clientMenu: selectedRowData})
@@ -128,9 +105,16 @@ class MenuList extends React.Component {
             />
             <div style={{display: 'flex', justifyContent: 'right', alignItems: 'center', marginBottom: '16px'}}>
             {this.calculatePrice()}
-            <Link to={{ pathname: `/pay?clientMenu=${new Buffer(JSON.stringify(this.state.clientMenu)).toString('base64')}`}}>
-              <Button variant="contained" color="success" sx={{mr: '15vw', ml: '16px'}} onClick={() => console.log(this.state.clientMenu)}>Pay</Button>
-            </Link>
+            {/* <Link style={{textDecoration: 'none'}} to={{ pathname: `/pay?clientMenu=${new Buffer(JSON.stringify(this.state.clientMenu)).toString('base64')}`}}> */}
+              <Button 
+              href={`/pay?clientMenu=${new Buffer(JSON.stringify(this.state.clientMenu)).toString('base64')}`}
+              variant="contained"
+              color="success"
+              disabled={this.state.clientMenu.length === 0}
+              sx={{mr: '25vw', ml: '16px'}}>
+                Pay
+              </Button>
+            {/* </Link> */}
             </div>
           </div>  
         )}
