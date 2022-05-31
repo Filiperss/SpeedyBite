@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-bm(7l(zr)22yjw9+b-^p(l=lcnnb!4uf1shudwyijg)%1_)nfc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['speedy-bite.us-east-1.elasticbeanstalk.com', 'localhost']
+ALLOWED_HOSTS = ['speedy-bite.us-east-1.elasticbeanstalk.com', 'localhost', '127.0.0.1']
 
 REACT_ROUTE_REACT_CLIENT = os.path.join(BASE_DIR, 'reactclient', 'client-frontend', 'build')
 REACT_ROUTE_REACT_STAFF = os.path.join(BASE_DIR, 'reactstaff', 'staff-frontend', 'build')
@@ -203,7 +203,7 @@ SPECTACULAR_SETTINGS = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=3),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,

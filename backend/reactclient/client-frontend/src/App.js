@@ -14,7 +14,6 @@ import Pay from './components/Pay'
 //     ]);
 // }
 
-
 function App() {
 
   return (

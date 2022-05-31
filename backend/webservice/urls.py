@@ -38,23 +38,18 @@ urlpatterns = [
     # Endpoint for the kitchen staff login - DEPRECATED, use /token instead
     path('login', views.loginStaff),
 
-    path('checkOrders', views.checkOrders),#views.CheckOrdersView.as_view()),
+    # Pick an active order - Staff Only
+    path('pickOrder', views.pickOrder, name='pickOrder'),
 
     # Clients Endpoints
 
     # Endpoint for the client's payment
     path('pay', views.pay, name='pay'),
 
-    # Endpoint for the client's delivery confirmation
-    path('confirmDelivery', views.confirmDelivery, name='confirmDelivery'),
-    
     # Endpoint for the restaurant's menu
     path('menuList', views.menuList, name='menuList'),
 
-    # Endpoint to calculate client's menu price
-    path('calculateClientMenuPrice', views.calculateClientMenuPrice, name='calculateClientMenuPrice'),
-
-    #Swagger     
+    ########## Swagger ##########
 
     path('schema', SpectacularAPIView.as_view(), name='schema'),
     re_path(r'^$',SpectacularSwaggerView.as_view()),

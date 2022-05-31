@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect}  from 'react';
 // import { BrowserRouter, Route, Routes  } from 'react-router-dom';
 import Dashboard from '../components/Dashboard';
 import Login from '../components/Login/Login.js'
@@ -14,21 +14,23 @@ function App() {
 
   const { decodedToken, isExpired } = useJwt(token);
   
-  console.log("token", token)
+  useEffect(() => {
+    console.log("token", token)
+    
 
-  const handleTokenInvalid = () => {
-    if(!token) {
+  })
+ 
+  if(!token) {
       return  <Login setToken={setToken} />
     }
-  }
-  
-  handleTokenInvalid();
 
-  if(isExpired){
-    token = requestToken(token,setToken)
-    handleTokenInvalid();
-  }
-
+    if(isExpired){
+      token = requestToken(token,setToken)
+      if(!token) {
+        return  <Login setToken={setToken} />
+      }
+    }
+    
   return (
     <div><Nav/>
       <div className="wrapper">

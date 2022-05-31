@@ -3,11 +3,7 @@ import axios from "axios";
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
-import { Router, withRouter} from 'react-router-dom';
 import { Buffer } from "buffer";
-import { Link } from "react-router-dom";
-
-import Pay from './Pay'
 
 const baseURL = "http://localhost:8000/webservice";
 
@@ -104,7 +100,7 @@ class MenuList extends React.Component {
               checkboxSelection
             />
             <div style={{display: 'flex', justifyContent: 'right', alignItems: 'center', marginBottom: '16px'}}>
-            {this.calculatePrice()}
+            <b>Total: </b> {this.calculatePrice()}
             {/* <Link style={{textDecoration: 'none'}} to={{ pathname: `/pay?clientMenu=${new Buffer(JSON.stringify(this.state.clientMenu)).toString('base64')}`}}> */}
               <Button 
               href={`/pay?clientMenu=${new Buffer(JSON.stringify(this.state.clientMenu)).toString('base64')}`}

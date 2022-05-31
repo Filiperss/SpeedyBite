@@ -86,7 +86,7 @@ const Pay = (props) => {
 	const payOrder = () => {
 		setIsPaying(true)
 		const payload = {
-			menuItems : clientMenu,
+			menuItems : JSON.stringify(clientMenu),
 			locationTag: locationTag,
 			clientPhoto: photoRef.current.toDataURL("image/png")
 		}
@@ -94,11 +94,13 @@ const Pay = (props) => {
 		axios.post(baseURL + "/pay", payload).then(res => {                     
           setIsPaying(false)
 		  setPayMessage(res.data.message)
+		  setErrorOccured(null)
 		  console.log(payMessage)
         }).catch(error => {
 			setIsPaying(false)
 			console.log(error);
-			setErrorOccured(error.response? error.response.data.message : 'Unexpected Error')
+			setPayMessage(null)
+			setErrorOccured(error.response? error.response.data.message : error.message)
 		 });
 
 	}
