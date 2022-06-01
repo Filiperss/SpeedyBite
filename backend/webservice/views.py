@@ -25,9 +25,9 @@ from django.contrib.auth.hashers import make_password, check_password
 
 
 #AWS
-AWS_ACCESS_KEY_ID = 'ASIAVREJBYCM66GHAQN6'
-AWS_SECRET = 'bwUpo7jOnP1Ka7jafu2nj0PrNBMxrAjfoLqWmsiz'
-AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEE8aDPj2LzUUrptM6EVtTSLLARStK6jy1DTxzubGhl/6jF2Ihw9D9z6oJFsVehORRRuNynGNwibsIzc1VKTGltjdDL7xDQkxvEh1NXqYhNc6BJ8R01yiuU8KGo8KHYWccucsl1ojCB7Ut2Fph0OrctWuznHY6CU/wL7qkkQbI8phYFbDhNj7ultNCiBrVWStnHQ/QXQ861QCaHWvB4BPbndVM7lLWAUtN+HrkvdTHlrk0Hzf1qSIlnPiA2n0bq62t3JqdG6NnMqa7vJVNLG7NoBAMRGkcSZqpk/vIkqzKMaa2pQGMi0muQzkHamYX18SfcYEjlK4iVJtZLVGoGrzrfVaXUC9qwRGU977STWXzKTgiBg='
+# AWS_ACCESS_KEY_ID = 'ASIAVREJBYCMU3MYMREN'
+# AWS_SECRET = 'xOChk4OlcjviOVICvKcN9iptWGEMFWTOQMB9mThQ'
+# AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEF8aDAg3CxDFu0I0ELdZvCLLAZaw+1DHhl/4owUL6qFTR48aqD/YjIAzzkAbynBrQoLxrAIkk6ltgnipokcf5dxl5IX4F4J2MIY0QhlFQ8wzCn4FCPZ3+cZBxMeK8QADTUsJFgd9sh/X5cQElTuFCqPRz0byH1usM9htyuWL0IpgJqjNqk8l8XeiBfUCbeSMgX+uZopcJMnQ0x4l+/E0hAZrRujx77njj+/ZPrMqtBqqKiXHI/8A9kbcixQXPJ4KnJtIWI5lEDQZbrEVjdULvxDN5L75seclEXQtxTpsKOLZ3ZQGMi0k+aqEy6s7MVr9HU60bOQyt+uRJWOjqyPwh5r16TQE1NzsyxobV0cOZqhzZE8='
 
 
 # Fetch every record of "MenuItems" table from AWS DynamoDB
@@ -36,10 +36,10 @@ AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEE8aDPj2LzUUrptM6EVtTSLLARStK6jy1DTxzubGhl/6jF2
 @permission_classes([])
 def menuList(request):
 
-	dynamodb = boto3.resource('dynamodb', aws_access_key_id=AWS_ACCESS_KEY_ID,
-				aws_secret_access_key=AWS_SECRET,
-				aws_session_token=AWS_SESSION_TOKEN,
-				region_name="us-east-1")
+	dynamodb = boto3.resource('dynamodb')#, aws_access_key_id=AWS_ACCESS_KEY_ID,
+				# aws_secret_access_key=AWS_SECRET,
+				# aws_session_token=AWS_SESSION_TOKEN,
+				# region_name="us-east-1")
 	
 	# # Gets data from database "MenuItems" 
 	table = dynamodb.Table('MenuItems')
@@ -180,10 +180,10 @@ def pickOrder(request):
     #                        region_name="us-east-1")
 
 
-	client = boto3.client('stepfunctions', aws_access_key_id=AWS_ACCESS_KEY_ID,
-				aws_secret_access_key=AWS_SECRET,
-				aws_session_token=AWS_SESSION_TOKEN,
-				region_name="us-east-1")
+	client = boto3.client('stepfunctions')#, aws_access_key_id=AWS_ACCESS_KEY_ID,
+				# aws_secret_access_key=AWS_SECRET,
+				# aws_session_token=AWS_SESSION_TOKEN,
+				# region_name="us-east-1")
 
 	response = client.start_sync_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:GetOrder')
 
