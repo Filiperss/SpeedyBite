@@ -11,7 +11,7 @@ import uuid
 from boto3.dynamodb.conditions import Key
 
 from rest_framework.views import APIView
-from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field, OpenApiTypes
+#from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field, OpenApiTypes
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -24,21 +24,13 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 
-AWS_ACCESS_KEY_ID = 'ASIAVREJBYCMWA4SU4FS'
-AWS_SECRET = 'frQjxTjq7x9lHR8O1jxY3UXvJ1zQDSkPu/IsYCDX'
-AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEGMaDLSErX4QyC7SRjOzkSLLAeyF/cn6x37WV3eWrHoQ8jdm5ER24q+d0ATiXs1b5jbppSxBnB2tYcYL3ED06D2y8BBmAqHIVfK1OWzpFjvEWpXDx2IYL1U7rxn5351gx9CP4EaRr6QxUPqlfb2OPq8ETm8L/56UAHm+1GrG3/ygw4u+ByLFwZxHEuakFZMPa9xjlAnpufb9zAn14rzPyCrCPaiIuMgg1QHDUyzRUSBscjwOCco337ig5znDXJOVCvSjFP/RmAs2DJr+6nIsTYtmP8AkWkqWqbI/8zd0KNi/3pQGMi1QEk7aRgo4BOcdpLc3jTzzzhgOSHzB19mgvVq7qUTRUitbZrHYZwgxmuk2h8E='
-
-
 # Fetch every record of "MenuItems" table from AWS DynamoDB
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
 def menuList(request):
 
-	dynamodb = boto3.resource('dynamodb', aws_access_key_id=AWS_ACCESS_KEY_ID,
-				aws_secret_access_key=AWS_SECRET,
-				aws_session_token=AWS_SESSION_TOKEN,
-				region_name="us-east-1")
+	dynamodb = boto3.resource('dynamodb')
 	
 	# # Gets data from database "MenuItems" 
 	table = dynamodb.Table('MenuItems')
@@ -133,7 +125,7 @@ def pay(request):
 @authentication_classes([])
 @permission_classes([])
 class RegisterStaff(APIView):
-	@extend_schema(request=None, responses=UserSerializer)
+	#@extend_schema(request=None, responses=UserSerializer)
 	def post(self, request, *args, **kwargs):
 		serializer = UserSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
@@ -198,10 +190,7 @@ def pickOrder(request):
     #                        region_name="us-east-1")
 
 
-	client = boto3.client('stepfunctions', aws_access_key_id=AWS_ACCESS_KEY_ID,
-				aws_secret_access_key=AWS_SECRET,
-				aws_session_token=AWS_SESSION_TOKEN,
-				region_name="us-east-1")
+	client = boto3.client('stepfunctions')
 
 	response = client.start_sync_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:GetOrder')
 	print(response)
@@ -231,10 +220,7 @@ def sendRobot(request):
     #                        aws_session_token='FwoGZXIvYXdzEE4aDLxfaCJoaa/wctcJfCLLAe4YLnyb9c9ajcxx+I5PQLd/MC8ecLSyM0EDsNnOokNyM9Owib/IABURkaeeLxnGWZBgkxHBmJ76OOpxjmTaxsbuW073VLIJroIIvm0dkwHfnMZ3CCGPUsi6JEvA8/DzNT+Q2Lz9RHjy96tNSLiY2ZSCcGAToXjOPhGLJE49U0LHrFYp3Qj7JBhTbIlNxcnWsu5yF0SZV6IZmR/27zd/EIuM/6oWS/YW6hvZLBcNSSuEW3nz4IGqJ3cjI7HSjlM+NAp9Dq2vJLtr2gUkKJbt2ZQGMi25kPeAuboU9TD+/hpQ/Ot/CpJg8GTri4gs4XwGItdrFDgEBrFp6EPDEmhlQek=',
     #                        region_name="us-east-1")
 
-	client = boto3.client('stepfunctions', aws_access_key_id=AWS_ACCESS_KEY_ID,
-                       aws_secret_access_key=AWS_SECRET,
-                       aws_session_token=AWS_SESSION_TOKEN,
-                       region_name="us-east-1")
+	client = boto3.client('stepfunctions')
 
 	response = client.start_sync_execution(
 		stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:FinishOrder',

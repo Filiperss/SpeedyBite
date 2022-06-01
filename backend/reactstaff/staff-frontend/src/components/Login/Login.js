@@ -18,7 +18,7 @@ import { createRoot } from 'react-dom/client';
 
 async function loginUser(credentials) {
 
-    let res = await fetch('http://localhost:8000/webservice/token', {
+    let res = await fetch('http://speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com/webservice/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

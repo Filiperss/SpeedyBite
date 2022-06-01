@@ -7,7 +7,7 @@ from rest_framework import permissions
 # from drf_yasg.views import get_schema_view
 # from drf_yasg import openapi
 
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+#from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -54,8 +54,8 @@ urlpatterns = [
 
     ########## Swagger ##########
 
-    path('schema', SpectacularAPIView.as_view(), name='schema'),
-    re_path(r'^$',SpectacularSwaggerView.as_view()),
+ #   path('schema', SpectacularAPIView.as_view(), name='schema'),
+ #   re_path(r'^$',SpectacularSwaggerView.as_view()),
     #Docs
-    re_path(r'^redoc', SpectacularRedocView.as_view()),
+  #  re_path(r'^redoc', SpectacularRedocView.as_view()),
 ]

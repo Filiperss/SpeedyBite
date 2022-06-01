@@ -6,7 +6,7 @@ import useToken from "../App/useToken";
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 
-const baseURL = "http://localhost:8000/webservice";
+const baseURL = "http://speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com/webservice";
 
 export default function Dashboard() {
   const [isFree, setIsFree] = useState(true);

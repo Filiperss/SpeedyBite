@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import { Buffer } from "buffer";
 
-const baseURL = "http://localhost:8000/webservice";
+const baseURL = "http://speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com/webservice";
 
 
 class MenuList extends React.Component {
