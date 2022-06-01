@@ -41,6 +41,9 @@ urlpatterns = [
     # Pick an active order - Staff Only
     path('pickOrder', views.pickOrder, name='pickOrder'),
 
+    # Pick an active order - Staff Only
+    path('sendRobot', views.sendRobot, name='sendRobot'),
+
     # Clients Endpoints
 
     # Endpoint for the client's payment

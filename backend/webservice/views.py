@@ -24,10 +24,9 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 
-#AWS
-# AWS_ACCESS_KEY_ID = 'ASIAVREJBYCMU3MYMREN'
-# AWS_SECRET = 'xOChk4OlcjviOVICvKcN9iptWGEMFWTOQMB9mThQ'
-# AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEF8aDAg3CxDFu0I0ELdZvCLLAZaw+1DHhl/4owUL6qFTR48aqD/YjIAzzkAbynBrQoLxrAIkk6ltgnipokcf5dxl5IX4F4J2MIY0QhlFQ8wzCn4FCPZ3+cZBxMeK8QADTUsJFgd9sh/X5cQElTuFCqPRz0byH1usM9htyuWL0IpgJqjNqk8l8XeiBfUCbeSMgX+uZopcJMnQ0x4l+/E0hAZrRujx77njj+/ZPrMqtBqqKiXHI/8A9kbcixQXPJ4KnJtIWI5lEDQZbrEVjdULvxDN5L75seclEXQtxTpsKOLZ3ZQGMi0k+aqEy6s7MVr9HU60bOQyt+uRJWOjqyPwh5r16TQE1NzsyxobV0cOZqhzZE8='
+AWS_ACCESS_KEY_ID = 'ASIAVREJBYCMWA4SU4FS'
+AWS_SECRET = 'frQjxTjq7x9lHR8O1jxY3UXvJ1zQDSkPu/IsYCDX'
+AWS_SESSION_TOKEN = 'FwoGZXIvYXdzEGMaDLSErX4QyC7SRjOzkSLLAeyF/cn6x37WV3eWrHoQ8jdm5ER24q+d0ATiXs1b5jbppSxBnB2tYcYL3ED06D2y8BBmAqHIVfK1OWzpFjvEWpXDx2IYL1U7rxn5351gx9CP4EaRr6QxUPqlfb2OPq8ETm8L/56UAHm+1GrG3/ygw4u+ByLFwZxHEuakFZMPa9xjlAnpufb9zAn14rzPyCrCPaiIuMgg1QHDUyzRUSBscjwOCco337ig5znDXJOVCvSjFP/RmAs2DJr+6nIsTYtmP8AkWkqWqbI/8zd0KNi/3pQGMi1QEk7aRgo4BOcdpLc3jTzzzhgOSHzB19mgvVq7qUTRUitbZrHYZwgxmuk2h8E='
 
 
 # Fetch every record of "MenuItems" table from AWS DynamoDB
@@ -36,10 +35,10 @@ from django.contrib.auth.hashers import make_password, check_password
 @permission_classes([])
 def menuList(request):
 
-	dynamodb = boto3.resource('dynamodb')#, aws_access_key_id=AWS_ACCESS_KEY_ID,
-				# aws_secret_access_key=AWS_SECRET,
-				# aws_session_token=AWS_SESSION_TOKEN,
-				# region_name="us-east-1")
+	dynamodb = boto3.resource('dynamodb', aws_access_key_id=AWS_ACCESS_KEY_ID,
+				aws_secret_access_key=AWS_SECRET,
+				aws_session_token=AWS_SESSION_TOKEN,
+				region_name="us-east-1")
 	
 	# # Gets data from database "MenuItems" 
 	table = dynamodb.Table('MenuItems')
@@ -162,13 +161,32 @@ def loginStaff(request):
 	# Get items returned by table.query()
 	# It could return more than one, how it is done currently, but for now it works
 	item = response["Items"]
-
 	#if there are no items returned (Count == 0) or if passwords don't match
 	# NOTE: Doesnt work because admin creates user manually, so check_password does not work
 	if response["Count"] == 0 or encrypted_password != item[0]["password"]:
 		raise AuthenticationFailed('Wrong Credentials.')
 
-	return Response({'message': 'Login Successful. Welcome!'})
+	username = item[0]["username"]
+	password = item[0]["password"]
+	if username is not None:
+	# if response["Count"] != 0 and encrypted_password == item[0]["password"]:
+		# payload = {
+		# 	'username': username,
+		# 	'exp': datetime.now(),
+		# 	'token_type': 'access'
+		# }
+		serializer = TokenObtainViewSerializer(data=item[0])
+		serializer.is_valid(raise_exception=True)
+		print(serializer)
+
+		# serializerRefresh = TokenRefreshLifetimeSerializer(data=item[0])
+		# serializerRefresh.is_valid(raise_exception=True)
+		# print(serializerRefresh)
+		# token = jwt.encode(payload, "ES2022").decode('utf-8')
+		return JsonResponse(serializer)
+
+	else:
+		return JsonResponse({'message': 'The credentials provided are invalid.'})
 
 #Pick an order that is currently available
 @api_view(['GET'])
@@ -180,21 +198,47 @@ def pickOrder(request):
     #                        region_name="us-east-1")
 
 
-	client = boto3.client('stepfunctions')#, aws_access_key_id=AWS_ACCESS_KEY_ID,
-				# aws_secret_access_key=AWS_SECRET,
-				# aws_session_token=AWS_SESSION_TOKEN,
-				# region_name="us-east-1")
+	client = boto3.client('stepfunctions', aws_access_key_id=AWS_ACCESS_KEY_ID,
+				aws_secret_access_key=AWS_SECRET,
+				aws_session_token=AWS_SESSION_TOKEN,
+				region_name="us-east-1")
 
 	response = client.start_sync_execution(stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:GetOrder')
-
-	if response["output"] is None:
+	print(response)
+	if response["status"] == 'FAILED' or response["output"] is None:
 		return Response({"message": "An Error happened while catching an order."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	
 	responseOutput = response["output"]
-	order = json.loads(orderInfo)
+	order = json.loads(responseOutput)
 	# print("Inputted\n\n\n",order)
-	inputted = json.loads(order["Input"])
+	order["Input"] = json.loads(order["Input"])
+	order["Input"]["menuItems"] = json.loads(order["Input"]["menuItems"])
 	# print(inputted["menuItems"])
 	# Returns an active Order
-	return Response(inputted)
+	print(order)
+	return Response(order)
 
+
+
+@api_view(['POST'])
+def sendRobot(request):
+	print(request)
+	response_decoded = json.loads(request.body.decode("utf-8"))
+	print(response_decoded)
+	
+	# dynamodb = boto3.resource('dynamodb', aws_access_key_id='ASIAVREJBYCMSWSU4WUL',
+    #                        aws_secret_access_key='XVWbw3tDSf4TxAsR6BydLpE357eNdTF/bQyX8uUt',
+    #                        aws_session_token='FwoGZXIvYXdzEE4aDLxfaCJoaa/wctcJfCLLAe4YLnyb9c9ajcxx+I5PQLd/MC8ecLSyM0EDsNnOokNyM9Owib/IABURkaeeLxnGWZBgkxHBmJ76OOpxjmTaxsbuW073VLIJroIIvm0dkwHfnMZ3CCGPUsi6JEvA8/DzNT+Q2Lz9RHjy96tNSLiY2ZSCcGAToXjOPhGLJE49U0LHrFYp3Qj7JBhTbIlNxcnWsu5yF0SZV6IZmR/27zd/EIuM/6oWS/YW6hvZLBcNSSuEW3nz4IGqJ3cjI7HSjlM+NAp9Dq2vJLtr2gUkKJbt2ZQGMi25kPeAuboU9TD+/hpQ/Ot/CpJg8GTri4gs4XwGItdrFDgEBrFp6EPDEmhlQek=',
+    #                        region_name="us-east-1")
+
+	client = boto3.client('stepfunctions', aws_access_key_id=AWS_ACCESS_KEY_ID,
+                       aws_secret_access_key=AWS_SECRET,
+                       aws_session_token=AWS_SESSION_TOKEN,
+                       region_name="us-east-1")
+
+	response = client.start_sync_execution(
+		stateMachineArn='arn:aws:states:us-east-1:380392030361:stateMachine:FinishOrder',
+		input=json.dumps(response_decoded))
+
+	print(response)
+	return Response({"message": "Order Delivered", "response": response})

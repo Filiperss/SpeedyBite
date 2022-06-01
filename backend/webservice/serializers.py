@@ -1,3 +1,5 @@
+from rest_framework_simplejwt.tokens import RefreshToken
+# from rest_framework_simplejwt.serializers import TokenObtainPairView, TokenRefreshView
 from rest_framework import serializers
 from .models import User
 from django.contrib.auth.hashers import make_password
@@ -18,3 +20,4 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.save()
         return user
+
