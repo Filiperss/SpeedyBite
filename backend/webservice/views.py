@@ -23,6 +23,7 @@ from .models import User
 from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
+AWS_REGION = 'us-east-1'
 
 # Fetch every record of "MenuItems" table from AWS DynamoDB
 @api_view(["GET"])
@@ -30,7 +31,7 @@ from django.contrib.auth.hashers import make_password, check_password
 @permission_classes([])
 def menuList(request):
 
-	dynamodb = boto3.resource('dynamodb')
+	dynamodb = boto3.resource('dynamodb', region_name = AWS_REGION)
 	
 	# # Gets data from database "MenuItems" 
 	table = dynamodb.Table('MenuItems')
@@ -56,7 +57,7 @@ def pay(request):
 	# Cuts off the initial header | "e.g: data:jpg\base64,"
 	headlessPhoto = response_decoded["clientPhoto"][index + 7:]
    
-	s3 = boto3.resource('s3')  
+	s3 = boto3.resource('s3', region_name = AWS_REGION)  
 	
 	# filePath = 'tmp/'+response_decoded["fileName"] 
 	filePath = 'tmp/'+str(uuid.uuid4()) 
@@ -142,7 +143,7 @@ def loginStaff(request):
 	username = response_decoded["username"]
 	encrypted_password = make_password(response_decoded['password'], 'ES2022')
 
-	dynamodb = boto3.resource('dynamodb')
+	dynamodb = boto3.resource('dynamodb', region_name = AWS_REGION)
 
 	# Gets data from table "Users" 
 	table = dynamodb.Table('Staff')

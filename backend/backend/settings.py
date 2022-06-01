@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-bm(7l(zr)22yjw9+b-^p(l=lcnnb!4uf1shudwyijg)%1_)nfc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com', 'localhost', '127.0.0.1']
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'reactstaff',
+    'reactclient',
     'webservice',
     'corsheaders'
 ]
@@ -67,14 +68,14 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware"
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:3000", #NOTE: Frontend Development Standalone
-    "http://127.0.0.1:3000" #NOTE: Frontend Development Standalone
-]
-
+# CORS_ALLOWED_ORIGINS = [
+#     "http://speedybite-env-1.eba-j63wkqqy.us-east-1.elasticbeanstalk.com",
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+#     "http://localhost:3000", #NOTE: Frontend Development Standalone
+#     "http://127.0.0.1:3000" #NOTE: Frontend Development Standalone
+# ]
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'backend.urls'
 
